@@ -1,6 +1,8 @@
+import java.util.Stack;
+
 public class QuantityMeasurementApp {
 
-    // ===== UC3 CODE (UNCHANGED) =====
+    // ===== UC3: Generic Quantity (DRY) =====
     enum Unit {
         FEET(1.0),
         INCH(1.0 / 12.0);
@@ -40,14 +42,13 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // ===== UC4 CODE (NEW) =====
-
+    // ===== UC4: Two-Pointer Palindrome =====
     public static boolean isPalindrome(String input) {
         if (input == null) {
             throw new IllegalArgumentException("Input cannot be null");
         }
 
-        char[] chars = input.toCharArray(); // convert to char[]
+        char[] chars = input.toCharArray();
 
         int left = 0;
         int right = chars.length - 1;
@@ -62,9 +63,31 @@ public class QuantityMeasurementApp {
         return true;
     }
 
+    // ===== UC5: Stack-Based Palindrome =====
+    public static boolean isPalindromeUsingStack(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException("Input cannot be null");
+        }
+
+        Stack<Character> stack = new Stack<>();
+
+        // Push characters
+        for (char ch : input.toCharArray()) {
+            stack.push(ch);
+        }
+
+        // Compare while popping
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) != stack.pop()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
 
-        // ===== UC3 TEST =====
+        // ===== UC1, UC2, UC3 Tests =====
         Quantity q1 = new Quantity(5.0, Unit.FEET);
         Quantity q2 = new Quantity(5.0, Unit.FEET);
 
@@ -74,11 +97,18 @@ public class QuantityMeasurementApp {
         System.out.println("Feet equality: " + q1.isEqual(q2));
         System.out.println("Feet vs Inches equality: " + q3.isEqual(q4));
 
-        // ===== UC4 TEST =====
+        // ===== UC4 Test =====
         String test1 = "madam";
         String test2 = "hello";
 
-        System.out.println("Is 'madam' palindrome? " + isPalindrome(test1));
-        System.out.println("Is 'hello' palindrome? " + isPalindrome(test2));
+        System.out.println("Two-pointer 'madam'? " + isPalindrome(test1));
+        System.out.println("Two-pointer 'hello'? " + isPalindrome(test2));
+
+        // ===== UC5 Test =====
+        String test3 = "level";
+        String test4 = "world";
+
+        System.out.println("Stack 'level'? " + isPalindromeUsingStack(test3));
+        System.out.println("Stack 'world'? " + isPalindromeUsingStack(test4));
     }
 }
