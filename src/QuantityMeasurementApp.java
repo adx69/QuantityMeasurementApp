@@ -4,12 +4,12 @@ import java.util.LinkedList;
 
 public class QuantityMeasurementApp {
 
-    // ===== UPDATED UNIT ENUM (UC4 EXTENSION) =====
+    // ===== EXTENDED UNIT ENUM =====
     enum Unit {
         FEET(1.0),
         INCH(1.0 / 12.0),
-        YARD(3.0), // 1 yard = 3 feet
-        CM(0.393701 / 12.0); // 1 cm = 0.393701 inches → convert to feet
+        YARD(3.0),
+        CM(0.393701 / 12.0);
 
         private final double toFeet;
 
@@ -20,6 +20,10 @@ public class QuantityMeasurementApp {
         public double toBase(double value) {
             return value * toFeet;
         }
+
+        public double fromBase(double baseValue) {
+            return baseValue / toFeet;
+        }
     }
 
     // ===== GENERIC QUANTITY CLASS =====
@@ -28,10 +32,12 @@ public class QuantityMeasurementApp {
         private final Unit unit;
 
         public Quantity(Double value, Unit unit) {
-            if (value == null)
-                throw new IllegalArgumentException("Value cannot be null");
-            if (unit == null)
+            if (value == null || !Double.isFinite(value)) {
+                throw new IllegalArgumentException("Invalid numeric value");
+            }
+            if (unit == null) {
                 throw new IllegalArgumentException("Unit cannot be null");
+            }
             this.value = value;
             this.unit = unit;
         }
@@ -45,9 +51,25 @@ public class QuantityMeasurementApp {
                 throw new IllegalArgumentException("Other cannot be null");
             return Double.compare(this.toBase(), other.toBase()) == 0;
         }
+
+        // ===== UC5: CONVERSION METHOD =====
+        public static double convert(double value, Unit source, Unit target) {
+            if (!Double.isFinite(value)) {
+                throw new IllegalArgumentException("Value must be finite");
+            }
+            if (source == null || target == null) {
+                throw new IllegalArgumentException("Units cannot be null");
+            }
+
+            // Step 1: convert to base (feet)
+            double baseValue = source.toBase(value);
+
+            // Step 2: convert base → target
+            return target.fromBase(baseValue);
+        }
     }
 
-    // ===== UC4 (OLD): Two-Pointer Palindrome =====
+    // ===== UC4: Two-Pointer Palindrome =====
     public static boolean isPalindrome(String input) {
         if (input == null)
             throw new IllegalArgumentException("Input cannot be null");
@@ -102,17 +124,22 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        // ===== TEST: Extended Units =====
+        // ===== Equality Tests =====
         Quantity q1 = new Quantity(1.0, Unit.YARD);
         Quantity q2 = new Quantity(3.0, Unit.FEET);
 
-        Quantity q3 = new Quantity(2.54, Unit.CM); // 2.54 cm ≈ 1 inch
-        Quantity q4 = new Quantity(1.0, Unit.INCH);
+        System.out.println("Yard vs Feet equality: " + q1.isEqual(q2));
 
-        System.out.println("Yard vs Feet: " + q1.isEqual(q2));
-        System.out.println("CM vs Inch: " + q3.isEqual(q4));
+        // ===== UC5: Conversion Tests =====
+        double feetToInch = Quantity.convert(1.0, Unit.FEET, Unit.INCH);
+        double yardToInch = Quantity.convert(1.0, Unit.YARD, Unit.INCH);
+        double cmToFeet = Quantity.convert(30.48, Unit.CM, Unit.FEET);
 
-        // ===== Existing Tests =====
+        System.out.println("1 Foot in Inches: " + feetToInch);
+        System.out.println("1 Yard in Inches: " + yardToInch);
+        System.out.println("30.48 cm in Feet: " + cmToFeet);
+
+        // ===== Palindrome Tests =====
         System.out.println("Two-pointer 'madam'? " + isPalindrome("madam"));
         System.out.println("Stack 'level'? " + isPalindromeUsingStack("level"));
         System.out.println("Queue+Stack 'racecar'? " + isPalindromeUsingQueueAndStack("racecar"));
