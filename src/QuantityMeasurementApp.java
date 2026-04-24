@@ -65,19 +65,34 @@ public class QuantityMeasurementApp {
             return target.fromBase(base);
         }
 
-        // ===== UC6: ADDITION =====
+        // ===== UC6: ADD (default → first operand unit) =====
         public Quantity add(Quantity other) {
             if (other == null) {
                 throw new IllegalArgumentException("Other quantity cannot be null");
             }
 
-            // Convert both to base (feet)
             double sumBase = this.toBase() + other.toBase();
-
-            // Convert back to unit of first operand
             double resultValue = this.unit.fromBase(sumBase);
 
             return new Quantity(resultValue, this.unit);
+        }
+
+        // ===== UC7: ADD WITH TARGET UNIT =====
+        public Quantity add(Quantity other, Unit targetUnit) {
+            if (other == null) {
+                throw new IllegalArgumentException("Other quantity cannot be null");
+            }
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
+            }
+
+            // Convert both → base (feet)
+            double sumBase = this.toBase() + other.toBase();
+
+            // Convert → target unit
+            double resultValue = targetUnit.fromBase(sumBase);
+
+            return new Quantity(resultValue, targetUnit);
         }
 
         @Override
@@ -151,13 +166,14 @@ public class QuantityMeasurementApp {
         System.out.println("1 Yard in Inches: " + Quantity.convert(1.0, Unit.YARD, Unit.INCH));
         System.out.println("30.48 cm in Feet: " + Quantity.convert(30.48, Unit.CM, Unit.FEET));
 
-        // ===== UC6: Addition =====
+        // ===== UC6 ADD =====
         Quantity f1 = new Quantity(1.0, Unit.FEET);
         Quantity i1 = new Quantity(12.0, Unit.INCH);
+        System.out.println("1 foot + 12 inch = " + f1.add(i1));
 
-        Quantity result = f1.add(i1);
-
-        System.out.println("1 foot + 12 inch = " + result);
+        // ===== UC7 ADD WITH TARGET UNIT =====
+        Quantity resultInYard = f1.add(i1, Unit.YARD);
+        System.out.println("1 foot + 12 inch in YARD = " + resultInYard);
 
         // ===== Palindrome Tests =====
         System.out.println("Two-pointer 'madam'? " + isPalindrome("madam"));
