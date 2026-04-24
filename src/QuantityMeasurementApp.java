@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 public class QuantityMeasurementApp {
 
-    // ===== EXTENDED UNIT ENUM =====
+    // ===== UNIT ENUM =====
     enum Unit {
         FEET(1.0),
         INCH(1.0 / 12.0),
@@ -52,7 +52,7 @@ public class QuantityMeasurementApp {
             return Double.compare(this.toBase(), other.toBase()) == 0;
         }
 
-        // ===== UC5: CONVERSION METHOD =====
+        // ===== UC5: CONVERSION =====
         public static double convert(double value, Unit source, Unit target) {
             if (!Double.isFinite(value)) {
                 throw new IllegalArgumentException("Value must be finite");
@@ -61,11 +61,28 @@ public class QuantityMeasurementApp {
                 throw new IllegalArgumentException("Units cannot be null");
             }
 
-            // Step 1: convert to base (feet)
-            double baseValue = source.toBase(value);
+            double base = source.toBase(value);
+            return target.fromBase(base);
+        }
 
-            // Step 2: convert base → target
-            return target.fromBase(baseValue);
+        // ===== UC6: ADDITION =====
+        public Quantity add(Quantity other) {
+            if (other == null) {
+                throw new IllegalArgumentException("Other quantity cannot be null");
+            }
+
+            // Convert both to base (feet)
+            double sumBase = this.toBase() + other.toBase();
+
+            // Convert back to unit of first operand
+            double resultValue = this.unit.fromBase(sumBase);
+
+            return new Quantity(resultValue, this.unit);
+        }
+
+        @Override
+        public String toString() {
+            return value + " " + unit;
         }
     }
 
@@ -124,20 +141,23 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        // ===== Equality Tests =====
+        // ===== Equality =====
         Quantity q1 = new Quantity(1.0, Unit.YARD);
         Quantity q2 = new Quantity(3.0, Unit.FEET);
-
         System.out.println("Yard vs Feet equality: " + q1.isEqual(q2));
 
-        // ===== UC5: Conversion Tests =====
-        double feetToInch = Quantity.convert(1.0, Unit.FEET, Unit.INCH);
-        double yardToInch = Quantity.convert(1.0, Unit.YARD, Unit.INCH);
-        double cmToFeet = Quantity.convert(30.48, Unit.CM, Unit.FEET);
+        // ===== Conversion =====
+        System.out.println("1 Foot in Inches: " + Quantity.convert(1.0, Unit.FEET, Unit.INCH));
+        System.out.println("1 Yard in Inches: " + Quantity.convert(1.0, Unit.YARD, Unit.INCH));
+        System.out.println("30.48 cm in Feet: " + Quantity.convert(30.48, Unit.CM, Unit.FEET));
 
-        System.out.println("1 Foot in Inches: " + feetToInch);
-        System.out.println("1 Yard in Inches: " + yardToInch);
-        System.out.println("30.48 cm in Feet: " + cmToFeet);
+        // ===== UC6: Addition =====
+        Quantity f1 = new Quantity(1.0, Unit.FEET);
+        Quantity i1 = new Quantity(12.0, Unit.INCH);
+
+        Quantity result = f1.add(i1);
+
+        System.out.println("1 foot + 12 inch = " + result);
 
         // ===== Palindrome Tests =====
         System.out.println("Two-pointer 'madam'? " + isPalindrome("madam"));
