@@ -1,4 +1,6 @@
 import java.util.Stack;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class QuantityMeasurementApp {
 
@@ -49,7 +51,6 @@ public class QuantityMeasurementApp {
         }
 
         char[] chars = input.toCharArray();
-
         int left = 0;
         int right = chars.length - 1;
 
@@ -71,14 +72,36 @@ public class QuantityMeasurementApp {
 
         Stack<Character> stack = new Stack<>();
 
-        // Push characters
         for (char ch : input.toCharArray()) {
             stack.push(ch);
         }
 
-        // Compare while popping
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) != stack.pop()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ===== UC6: Queue + Stack Palindrome =====
+    public static boolean isPalindromeUsingQueueAndStack(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException("Input cannot be null");
+        }
+
+        Queue<Character> queue = new LinkedList<>();
+        Stack<Character> stack = new Stack<>();
+
+        // Add characters to both structures
+        for (char ch : input.toCharArray()) {
+            queue.add(ch); // FIFO
+            stack.push(ch); // LIFO
+        }
+
+        // Compare dequeue vs pop
+        while (!queue.isEmpty()) {
+            if (queue.remove() != stack.pop()) {
                 return false;
             }
         }
@@ -98,17 +121,15 @@ public class QuantityMeasurementApp {
         System.out.println("Feet vs Inches equality: " + q3.isEqual(q4));
 
         // ===== UC4 Test =====
-        String test1 = "madam";
-        String test2 = "hello";
-
-        System.out.println("Two-pointer 'madam'? " + isPalindrome(test1));
-        System.out.println("Two-pointer 'hello'? " + isPalindrome(test2));
+        System.out.println("Two-pointer 'madam'? " + isPalindrome("madam"));
+        System.out.println("Two-pointer 'hello'? " + isPalindrome("hello"));
 
         // ===== UC5 Test =====
-        String test3 = "level";
-        String test4 = "world";
+        System.out.println("Stack 'level'? " + isPalindromeUsingStack("level"));
+        System.out.println("Stack 'world'? " + isPalindromeUsingStack("world"));
 
-        System.out.println("Stack 'level'? " + isPalindromeUsingStack(test3));
-        System.out.println("Stack 'world'? " + isPalindromeUsingStack(test4));
+        // ===== UC6 Test =====
+        System.out.println("Queue+Stack 'racecar'? " + isPalindromeUsingQueueAndStack("racecar"));
+        System.out.println("Queue+Stack 'java'? " + isPalindromeUsingQueueAndStack("java"));
     }
 }
