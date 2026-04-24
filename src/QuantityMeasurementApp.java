@@ -4,10 +4,12 @@ import java.util.LinkedList;
 
 public class QuantityMeasurementApp {
 
-    // ===== UC3: Generic Quantity (DRY) =====
+    // ===== UPDATED UNIT ENUM (UC4 EXTENSION) =====
     enum Unit {
         FEET(1.0),
-        INCH(1.0 / 12.0);
+        INCH(1.0 / 12.0),
+        YARD(3.0), // 1 yard = 3 feet
+        CM(0.393701 / 12.0); // 1 cm = 0.393701 inches → convert to feet
 
         private final double toFeet;
 
@@ -20,6 +22,7 @@ public class QuantityMeasurementApp {
         }
     }
 
+    // ===== GENERIC QUANTITY CLASS =====
     static class Quantity {
         private final Double value;
         private final Unit unit;
@@ -44,92 +47,74 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // ===== UC4: Two-Pointer Palindrome =====
+    // ===== UC4 (OLD): Two-Pointer Palindrome =====
     public static boolean isPalindrome(String input) {
-        if (input == null) {
+        if (input == null)
             throw new IllegalArgumentException("Input cannot be null");
-        }
 
         char[] chars = input.toCharArray();
-        int left = 0;
-        int right = chars.length - 1;
+        int left = 0, right = chars.length - 1;
 
         while (left < right) {
-            if (chars[left] != chars[right]) {
+            if (chars[left] != chars[right])
                 return false;
-            }
             left++;
             right--;
         }
         return true;
     }
 
-    // ===== UC5: Stack-Based Palindrome =====
+    // ===== UC5: Stack Palindrome =====
     public static boolean isPalindromeUsingStack(String input) {
-        if (input == null) {
+        if (input == null)
             throw new IllegalArgumentException("Input cannot be null");
-        }
 
         Stack<Character> stack = new Stack<>();
-
-        for (char ch : input.toCharArray()) {
+        for (char ch : input.toCharArray())
             stack.push(ch);
-        }
 
         for (int i = 0; i < input.length(); i++) {
-            if (input.charAt(i) != stack.pop()) {
+            if (input.charAt(i) != stack.pop())
                 return false;
-            }
         }
         return true;
     }
 
     // ===== UC6: Queue + Stack Palindrome =====
     public static boolean isPalindromeUsingQueueAndStack(String input) {
-        if (input == null) {
+        if (input == null)
             throw new IllegalArgumentException("Input cannot be null");
-        }
 
         Queue<Character> queue = new LinkedList<>();
         Stack<Character> stack = new Stack<>();
 
-        // Add characters to both structures
         for (char ch : input.toCharArray()) {
-            queue.add(ch); // FIFO
-            stack.push(ch); // LIFO
+            queue.add(ch);
+            stack.push(ch);
         }
 
-        // Compare dequeue vs pop
         while (!queue.isEmpty()) {
-            if (queue.remove() != stack.pop()) {
+            if (queue.remove() != stack.pop())
                 return false;
-            }
         }
         return true;
     }
 
     public static void main(String[] args) {
 
-        // ===== UC1, UC2, UC3 Tests =====
-        Quantity q1 = new Quantity(5.0, Unit.FEET);
-        Quantity q2 = new Quantity(5.0, Unit.FEET);
+        // ===== TEST: Extended Units =====
+        Quantity q1 = new Quantity(1.0, Unit.YARD);
+        Quantity q2 = new Quantity(3.0, Unit.FEET);
 
-        Quantity q3 = new Quantity(12.0, Unit.INCH);
-        Quantity q4 = new Quantity(1.0, Unit.FEET);
+        Quantity q3 = new Quantity(2.54, Unit.CM); // 2.54 cm ≈ 1 inch
+        Quantity q4 = new Quantity(1.0, Unit.INCH);
 
-        System.out.println("Feet equality: " + q1.isEqual(q2));
-        System.out.println("Feet vs Inches equality: " + q3.isEqual(q4));
+        System.out.println("Yard vs Feet: " + q1.isEqual(q2));
+        System.out.println("CM vs Inch: " + q3.isEqual(q4));
 
-        // ===== UC4 Test =====
+        // ===== Existing Tests =====
         System.out.println("Two-pointer 'madam'? " + isPalindrome("madam"));
-        System.out.println("Two-pointer 'hello'? " + isPalindrome("hello"));
-
-        // ===== UC5 Test =====
         System.out.println("Stack 'level'? " + isPalindromeUsingStack("level"));
-        System.out.println("Stack 'world'? " + isPalindromeUsingStack("world"));
-
-        // ===== UC6 Test =====
         System.out.println("Queue+Stack 'racecar'? " + isPalindromeUsingQueueAndStack("racecar"));
-        System.out.println("Queue+Stack 'java'? " + isPalindromeUsingQueueAndStack("java"));
     }
 }
